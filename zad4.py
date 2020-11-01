@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Prosze podac argument przy odpalaniu programu. Jest to stopien dywanu.
+# Dostepne sa dwie implementacje, jedna robi wciecia, druga rysuje male kwadraty.
+# Wybor algorytmu jest poprzez zakomentowanie, odkomentowanie jednej z funkcji
+# w redner().
 import sys
 import random
 from glfw.GLFW import *
@@ -16,58 +20,62 @@ def shutdown():
     pass
 
 
-def render(time, seed, level):
-    #set the same seed for every render, thus getting the same colors
+def render(time, seed, depth):
+    # Set the same seed for every render, thus getting the same colors
     random.seed(seed)
     glClear(GL_COLOR_BUFFER_BIT)
-    #renderCarpetSquares(0,0,120,120,level)
-    rednerCarpetIndents(0,0,120,120,level)
+
+
+    # Choose which version of sierpinski's carpet to render, indents works
+    # much faster.
+    renderCarpetSquares(0,0,150,150,depth)
+    #rednerCarpetIndents(0, 0, 120, 120,depth)
 
 
     glFlush()
 
 
-def renderFragment(x ,y ,a ,b ,d = 0):
+def renderFragment(x, y, a, b, d = 0):
     if(d != 0):
         a = a * d
         b = b * d
-    renderRectangle(x-a ,y+b ,a ,b)
-    renderRectangle(x ,y+b ,a ,b)
-    renderRectangle(x+a ,y+b ,a ,b)
-    renderRectangle(x-a ,y ,a ,b)
-    renderEmptyRectangle(x,y,a,b)
-    renderRectangle(x+a ,y ,a ,b)
-    renderRectangle(x-a ,y-b ,a ,b)
-    renderRectangle(x, y-b ,a ,b)
-    renderRectangle(x+a ,y-b ,a ,b)
+    renderRectangle(x-a, y+b, a, b)
+    renderRectangle(x, y+b, a, b)
+    renderRectangle(x+a, y+b, a, b)
+    renderRectangle(x-a, y, a, b)
+    renderEmptyRectangle(x, y, a, b)
+    renderRectangle(x+a, y, a, b)
+    renderRectangle(x-a, y-b, a, b)
+    renderRectangle(x, y-b, a, b)
+    renderRectangle(x+a, y-b, a, b)
 
-def renderCarpetSquares(x, y, a, b, level):
-    if level > 0:
-        new_a = a / 3.0
-        new_b = b / 3.0
-        renderFragment(x, y, new_a, new_b)
-        if level > 1:
+def renderCarpetSquares(x, y, a, b, depth):
+    if depth > 0:
+        a = a / 3.0
+        b = b / 3.0
+        renderFragment(x, y, a, b)
+        if depth > 1:
             for i  in range(-1, 2):
                 for j in range(-1, 2):
                     if i == 0 and j == 0:
                         continue
-                    renderCarpetSquares(x + (new_b * i), y + (new_a * j), new_a, new_b, level - 1)
+                    renderCarpetSquares(x + (a * i), y + (b * j), a, b, depth - 1)
 
-def rednerCarpetIndents(x, y, a, b, level):
-    renderFragment(0,0,a/3,b/3)
-    renderCarpetv2(0,0,a,b,level)
+def rednerCarpetIndents(x, y, a, b, depth):
+    renderFragment(0, 0, a/3, b/3)
+    renderCarpetv2(0, 0, a, b, depth)
 
-def renderCarpetv2(x, y, a, b, level):
-    if level > 0:
-        new_a = a / 3.0
-        new_b = b / 3.0
-        renderEmptyRectangle(x, y, new_a, new_b)
-        if level > 1:
+def renderCarpetv2(x, y, a, b, depth):
+    if depth > 0:
+        a = a / 3.0
+        b = b / 3.0
+        renderEmptyRectangle(x, y, a, b)
+        if depth > 1:
             for i  in range(-1, 2):
                 for j in range(-1, 2):
                     if i == 0 and j == 0:
                         continue
-                    renderCarpetv2(x + (new_b * i), y + (new_a * j), new_a, new_b, level - 1)
+                    renderCarpetv2(x + (a * i), y + (b * j), a, b, depth - 1)
 
 def renderRectangle(x, y, a, b, d = 0):
     if(d != 0):
